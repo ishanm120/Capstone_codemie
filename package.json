@@ -1,0 +1,13 @@
+{
+  "name": "task-manager-v1",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix backend start & npm --prefix frontend run dev",
+    "start": "npm --prefix backend start & npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend start",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "test:backend": "npm --prefix backend test",
+    "test:e2e": "npm --prefix e2e test"
+  }
+}

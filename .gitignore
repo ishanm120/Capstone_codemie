@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build & Output
+dist/
+build/
+*.log
+
+# Database
+backend/tasks.db
+backend/tasks.db-journal
+
+# Playwright & Testing
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Environment & OS
+.env
+.env.local
+.DS_Store
+*.swp
