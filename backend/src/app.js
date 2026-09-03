@@ -4,6 +4,30 @@ import { query, getOne, run, initDb } from './db.js';
 
 export const app = express();
 
+const CONTROLLED_CATEGORIES = new Set([
+  'general',
+  'work',
+  'personal',
+  'design',
+  'backend',
+  'frontend',
+  'testing'
+]);
+
+function normalizeAndValidateCategory(category) {
+  // category omitted is handled by callers (POST default / PATCH keep existing)
+  if (category === null || category === undefined) return { ok: false };
+
+  if (typeof category !== 'string') return { ok: false };
+
+  const normalized = category.trim().toLowerCase();
+  if (!normalized) return { ok: false };
+
+  if (!CONTROLLED_CATEGORIES.has(normalized)) return { ok: false };
+
+  return { ok: true, value: normalized };
+}
+
 app.use(cors());
 app.use(express.json());
 
@@ -34,7 +58,8 @@ app.get('/api/tasks', async (req, res) => {
     }
 
     if (category && category !== 'all') {
-      sql += ' AND category = ?';
+      // Case-insensitive match without requiring DB migration / collation changes
+      sql += ' AND LOWER(category) = LOWER(?)';
       params.push(category);
     }
 
@@ -88,14 +113,23 @@ app.get('/api/tasks/:id', async (req, res) => {
 // POST /api/tasks - create new task
 app.post('/api/tasks', async (req, res) => {
   try {
-    const { title, description, priority = 'medium', category = 'general', due_date } = req.body;
+    const { title, description, priority = 'medium', category, due_date } = req.body;
     if (!title || !title.trim()) {
       return res.status(400).json({ error: 'Task title is required' });
     }
 
+    let categoryToStore = 'general';
+    if (category !== undefined) {
+      const validated = normalizeAndValidateCategory(category);
+      if (!validated.ok) {
+        return res.status(400).json({ error: 'INVALID_CATEGORY' });
+      }
+      categoryToStore = validated.value;
+    }
+
     const result = await run(
       `INSERT INTO tasks (title, description, completed, priority, category, due_date) VALUES (?, ?, 0, ?, ?, ?)`,
-      [title.trim(), (description || '').trim(), priority, category, due_date || null]
+      [title.trim(), (description || '').trim(), priority, categoryToStore, due_date || null]
     );
 
     const newTask = await getOne('SELECT * FROM tasks WHERE id = ?', [result.id]);
@@ -111,16 +145,26 @@ app.patch('/api/tasks/:id', async (req, res) => {
     const existing = await getOne('SELECT * FROM tasks WHERE id = ?', [req.params.id]);
     if (!existing) return res.status(404).json({ error: 'Task not found' });
 
+    // Validate category up-front to ensure no side effects on invalid category.
+    // Important: allow patching unrelated fields even if existing.category is legacy-invalid.
+    let categoryToStore = existing.category;
+    if (req.body.category !== undefined) {
+      const validated = normalizeAndValidateCategory(req.body.category);
+      if (!validated.ok) {
+        return res.status(400).json({ error: 'INVALID_CATEGORY' });
+      }
+      categoryToStore = validated.value;
+    }
+
     const title = req.body.title !== undefined ? req.body.title.trim() : existing.title;
     const description = req.body.description !== undefined ? req.body.description.trim() : existing.description;
     const completed = req.body.completed !== undefined ? (req.body.completed ? 1 : 0) : existing.completed;
     const priority = req.body.priority !== undefined ? req.body.priority : existing.priority;
-    const category = req.body.category !== undefined ? req.body.category : existing.category;
     const due_date = req.body.due_date !== undefined ? req.body.due_date : existing.due_date;
 
     await run(
       `UPDATE tasks SET title = ?, description = ?, completed = ?, priority = ?, category = ?, due_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-      [title, description, completed, priority, category, due_date, req.params.id]
+      [title, description, completed, priority, categoryToStore, due_date, req.params.id]
     );
 
     const updatedTask = await getOne('SELECT * FROM tasks WHERE id = ?', [req.params.id]);
