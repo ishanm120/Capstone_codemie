@@ -45,6 +45,25 @@ describe('Task Management API', () => {
     expect(res.body.length).toBe(2);
   });
 
+  it('GET /api/tasks?category=X should filter tasks by category', async () => {
+    await request(app).post('/api/tasks').send({ title: 'Work task', category: 'work' });
+    await request(app).post('/api/tasks').send({ title: 'Personal task', category: 'personal' });
+
+    const res = await request(app).get('/api/tasks?category=work');
+    expect(res.status).toBe(200);
+    expect(res.body.length).toBe(1);
+    expect(res.body[0].title).toBe('Work task');
+  });
+
+  it('GET /api/tasks?category=all should return tasks of every category', async () => {
+    await request(app).post('/api/tasks').send({ title: 'Work task', category: 'work' });
+    await request(app).post('/api/tasks').send({ title: 'Personal task', category: 'personal' });
+
+    const res = await request(app).get('/api/tasks?category=all');
+    expect(res.status).toBe(200);
+    expect(res.body.length).toBe(2);
+  });
+
   it('PATCH /api/tasks/:id should toggle task completed state', async () => {
     const created = await request(app).post('/api/tasks').send({ title: 'Task to complete' });
     const taskId = created.body.id;

@@ -64,7 +64,30 @@ test.describe('Task Management V1 Core Workflows', () => {
     await page.click('#filter-all-btn');
   });
 
-  test('4. Delete a task', async ({ page }) => {
+  test('4. Filter tasks by category (KAN-3)', async ({ page }) => {
+    const taskTitle = `Category Filter Task ${Date.now()}`;
+
+    // Create a task with a distinct category
+    await page.click('#add-task-btn');
+    await page.fill('#task-title-input', taskTitle);
+    await page.selectOption('#task-category-select', 'personal');
+    await page.click('#save-task-submit');
+    await expect(page.locator('.task-title', { hasText: taskTitle })).toBeVisible();
+
+    // Filtering by the task's own category keeps it visible
+    await page.selectOption('#category-select', 'personal');
+    await expect(page.locator('.task-title', { hasText: taskTitle })).toBeVisible();
+
+    // Filtering by a different category hides it
+    await page.selectOption('#category-select', 'design');
+    await expect(page.locator('.task-title', { hasText: taskTitle })).not.toBeVisible();
+
+    // "All Categories" removes category filtering entirely
+    await page.selectOption('#category-select', 'all');
+    await expect(page.locator('.task-title', { hasText: taskTitle })).toBeVisible();
+  });
+
+  test('5. Delete a task', async ({ page }) => {
     const taskTitle = `Delete Me Task ${Date.now()}`;
 
     // Create task
