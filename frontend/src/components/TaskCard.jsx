@@ -43,8 +43,8 @@ export function TaskCard({ task, onToggleComplete, onDelete, onEdit }) {
           <h4 className="task-title">{task.title}</h4>
           <div className="task-actions">
             <button
-              className="edit-btn"
-              onClick={() => onEdit(task)}
+              className="icon-btn edit-btn"
+              onClick={() => onEdit?.(task)}
               title="Edit task"
               id={`edit-task-${task.id}`}
             >
