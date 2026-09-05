@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { StatsSummary } from './components/StatsSummary';
 import { FilterBar } from './components/FilterBar';
 import { TaskForm } from './components/TaskForm';
+import { EditTaskModal } from './components/EditTaskModal';
 import { TaskList } from './components/TaskList';
 import { Toast } from './components/Toast';
 import { api } from './services/api';
@@ -12,9 +13,10 @@ export function App() {
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, highPriority: 0 });
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
   const [toasts, setToasts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [filters, setFilters] = useState({
     search: '',
     status: 'all',
@@ -30,9 +32,9 @@ export function App() {
 
   const showToast = (message, type = 'success') => {
     const id = Date.now();
-    setToasts(prev => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id, message, type }]);
     setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
+      setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 3500);
   };
 
@@ -57,7 +59,7 @@ export function App() {
   }, [filters]);
 
   const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   const handleCreateTask = async (taskData) => {
@@ -68,6 +70,26 @@ export function App() {
       loadData();
     } catch (err) {
       showToast(err.message || 'Failed to create task', 'warning');
+    }
+  };
+
+  const handleEditTask = (task) => {
+    setEditingTask(task);
+  };
+
+  const handleCancelEditTask = () => {
+    setEditingTask(null);
+  };
+
+  const handleSaveEditTask = async (updates) => {
+    try {
+      await api.updateTask(editingTask.id, updates);
+      showToast('Task updated successfully!', 'success');
+      setEditingTask(null);
+      loadData();
+    } catch (err) {
+      showToast(err.message || 'Failed to update task', 'warning');
+      throw err;
     }
   };
 
@@ -84,7 +106,7 @@ export function App() {
 
   const handleDeleteTask = async (id) => {
     try {
-      const result = await api.deleteTask(id);
+      await api.deleteTask(id);
       showToast('Task deleted successfully', 'info');
       loadData();
     } catch (err) {
@@ -98,34 +120,33 @@ export function App() {
       <div className="bg-glow-2" />
 
       <div className="content-container">
-        <Header 
-          theme={theme} 
-          toggleTheme={toggleTheme} 
-          onOpenForm={() => setIsFormOpen(prev => !prev)} 
-        />
+        <Header theme={theme} toggleTheme={toggleTheme} onOpenForm={() => setIsFormOpen((prev) => !prev)} />
 
         <StatsSummary stats={stats} />
 
-        {isFormOpen && (
-          <TaskForm 
-            onSubmit={handleCreateTask} 
-            onClose={() => setIsFormOpen(false)} 
-          />
-        )}
+        {isFormOpen && <TaskForm onSubmit={handleCreateTask} onClose={() => setIsFormOpen(false)} />}
 
         <FilterBar filters={filters} setFilters={setFilters} />
 
         {loading ? (
-          <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+          <div
+            className="glass-card"
+            style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}
+          >
             Loading your tasks...
           </div>
         ) : (
-          <TaskList 
-            tasks={tasks} 
-            onToggleComplete={handleToggleComplete} 
-            onDelete={handleDeleteTask} 
-            onOpenForm={() => setIsFormOpen(true)} 
+          <TaskList
+            tasks={tasks}
+            onToggleComplete={handleToggleComplete}
+            onDelete={handleDeleteTask}
+            onEditTask={handleEditTask}
+            onOpenForm={() => setIsFormOpen(true)}
           />
+        )}
+
+        {editingTask && (
+          <EditTaskModal task={editingTask} onCancel={handleCancelEditTask} onSave={handleSaveEditTask} />
         )}
       </div>
 
