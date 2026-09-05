@@ -24,21 +24,30 @@ describe('FilterBar - Category filter', () => {
   it('renders category dropdown with expected options', () => {
     renderFilterBar();
 
-    const categorySelect = screen.getByRole('combobox', { name: '' , hidden: false });
-    // Since the component has no label, select by id
-    expect(document.getElementById('category-select')).toBeTruthy();
+    // Since the component has no label, select by id (or test id if present)
+    const select = document.getElementById('category-select') as HTMLSelectElement | null;
+    expect(select).not.toBeNull();
 
-    const select = document.getElementById('category-select');
-    const optionValues = Array.from(select.options).map((o) => o.value);
-    expect(optionValues).toEqual(['all', 'work', 'personal', 'health']);
+    const optionData = Array.from(select!.options).map((o) => ({
+      value: o.value,
+      text: o.text,
+    }));
+
+    expect(optionData).toEqual([
+      { value: 'all', text: 'All Categories' },
+      { value: 'work', text: 'Work' },
+      { value: 'personal', text: 'Personal' },
+      { value: 'health', text: 'Health' },
+    ]);
   });
 
   it('selecting a category updates filters.category', async () => {
     const user = userEvent.setup();
     const { setFilters } = renderFilterBar({ category: 'all' });
 
-    const select = document.getElementById('category-select');
-    await user.selectOptions(select, 'work');
+    const select = document.getElementById('category-select') as HTMLSelectElement | null;
+    expect(select).not.toBeNull();
+    await user.selectOptions(select!, 'work');
 
     expect(setFilters).toHaveBeenCalledTimes(1);
     const updater = setFilters.mock.calls[0][0];
@@ -50,8 +59,9 @@ describe('FilterBar - Category filter', () => {
     const user = userEvent.setup();
     const { setFilters } = renderFilterBar({ category: 'work' });
 
-    const select = document.getElementById('category-select');
-    await user.selectOptions(select, 'all');
+    const select = document.getElementById('category-select') as HTMLSelectElement | null;
+    expect(select).not.toBeNull();
+    await user.selectOptions(select!, 'all');
 
     const updater = setFilters.mock.calls[0][0];
     expect(updater({ category: 'work' }).category).toBe('all');
