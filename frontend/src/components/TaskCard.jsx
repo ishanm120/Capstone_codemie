@@ -1,5 +1,6 @@
 import React from 'react';
-import { Check, Trash2, Calendar, Tag, AlertCircle, Pencil } from 'lucide-react';
+import { Check, Trash2, Calendar, Tag, AlertCircle } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 
 export function TaskCard({ task, onToggleComplete, onDelete, onEdit }) {
   const isCompleted = Boolean(task.completed);
@@ -7,7 +8,11 @@ export function TaskCard({ task, onToggleComplete, onDelete, onEdit }) {
   const getPriorityBadge = (p) => {
     switch (p) {
       case 'high':
-        return <span className="badge badge-high"><AlertCircle size={12} /> High</span>;
+        return (
+          <span className="badge badge-high">
+            <AlertCircle size={12} /> High
+          </span>
+        );
       case 'low':
         return <span className="badge badge-low">Low</span>;
       default:
@@ -61,9 +66,7 @@ export function TaskCard({ task, onToggleComplete, onDelete, onEdit }) {
           </div>
         </div>
 
-        {task.description && (
-          <p className="task-desc">{task.description}</p>
-        )}
+        {task.description && <p className="task-desc">{task.description}</p>}
 
         <div className="task-meta">
           {getPriorityBadge(task.priority)}
