@@ -11,15 +11,15 @@ export function FilterBar({ filters, setFilters }) {
   };
 
   const handlePriorityChange = (e) => {
-    setFilters((prev) => ({ ...prev, priority: e.target.value }));
+    setFilters(prev => ({ ...prev, priority: e.target.value }));
   };
 
   const handleCategoryChange = (e) => {
-    setFilters((prev) => ({ ...prev, category: e.target.value }));
+    setFilters(prev => ({ ...prev, category: e.target.value }));
   };
 
   const handleSortChange = (e) => {
-    setFilters((prev) => ({ ...prev, sortBy: e.target.value }));
+    setFilters(prev => ({ ...prev, sortBy: e.target.value }));
   };
 
   return (
