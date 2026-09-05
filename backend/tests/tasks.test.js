@@ -57,6 +57,39 @@ describe('Task Management API', () => {
     expect(patchRes.body.completed).toBe(1);
   });
 
+  it('PATCH /api/tasks/:id should edit task details', async () => {
+    const created = await request(app)
+      .post('/api/tasks')
+      .send({
+        title: 'Original title',
+        description: 'Original description',
+        priority: 'low',
+        category: 'work'
+      });
+
+    const taskId = created.body.id;
+
+    const updates = {
+      title: 'Updated title',
+      description: 'Updated description',
+      priority: 'high',
+      category: 'personal',
+      due_date: '2030-01-15'
+    };
+
+    const patchRes = await request(app)
+      .patch(`/api/tasks/${taskId}`)
+      .send(updates);
+
+    expect(patchRes.status).toBe(200);
+    expect(patchRes.body.id).toBe(taskId);
+    expect(patchRes.body.title).toBe(updates.title);
+    expect(patchRes.body.description).toBe(updates.description);
+    expect(patchRes.body.priority).toBe(updates.priority);
+    expect(patchRes.body.category).toBe(updates.category);
+    expect(patchRes.body.due_date).toBe(updates.due_date);
+  });
+
   it('DELETE /api/tasks/:id should remove a task', async () => {
     const created = await request(app).post('/api/tasks').send({ title: 'Task to delete' });
     const taskId = created.body.id;
