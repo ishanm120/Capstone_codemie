@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FilterBar } from '../FilterBar';
 
@@ -25,10 +25,13 @@ describe('FilterBar - Category filter', () => {
     renderFilterBar();
 
     // Since the component has no label, select by id (or test id if present)
-    const select = document.getElementById('category-select') as HTMLSelectElement | null;
+    const select = document.getElementById('category-select');
     expect(select).not.toBeNull();
 
-    const optionData = Array.from(select!.options).map((o) => ({
+    /** @type {HTMLSelectElement} */
+    const categorySelect = select;
+
+    const optionData = Array.from(categorySelect.options).map((o) => ({
       value: o.value,
       text: o.text,
     }));
@@ -45,9 +48,10 @@ describe('FilterBar - Category filter', () => {
     const user = userEvent.setup();
     const { setFilters } = renderFilterBar({ category: 'all' });
 
-    const select = document.getElementById('category-select') as HTMLSelectElement | null;
+    const select = document.getElementById('category-select');
     expect(select).not.toBeNull();
-    await user.selectOptions(select!, 'work');
+
+    await user.selectOptions(/** @type {HTMLSelectElement} */ (select), 'work');
 
     expect(setFilters).toHaveBeenCalledTimes(1);
     const updater = setFilters.mock.calls[0][0];
@@ -59,9 +63,10 @@ describe('FilterBar - Category filter', () => {
     const user = userEvent.setup();
     const { setFilters } = renderFilterBar({ category: 'work' });
 
-    const select = document.getElementById('category-select') as HTMLSelectElement | null;
+    const select = document.getElementById('category-select');
     expect(select).not.toBeNull();
-    await user.selectOptions(select!, 'all');
+
+    await user.selectOptions(/** @type {HTMLSelectElement} */ (select), 'all');
 
     const updater = setFilters.mock.calls[0][0];
     expect(updater({ category: 'work' }).category).toBe('all');
