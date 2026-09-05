@@ -4,6 +4,7 @@ import { StatsSummary } from './components/StatsSummary';
 import { FilterBar } from './components/FilterBar';
 import { TaskForm } from './components/TaskForm';
 import { TaskList } from './components/TaskList';
+import { EditTaskModal } from './components/EditTaskModal';
 import { Toast } from './components/Toast';
 import { api } from './services/api';
 
@@ -12,6 +13,8 @@ export function App() {
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, highPriority: 0 });
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
+  const [savingEdit, setSavingEdit] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -71,6 +74,31 @@ export function App() {
     }
   };
 
+  const handleEditTask = (task) => {
+    setEditingTask(task);
+  };
+
+  const handleCancelEdit = () => {
+    if (savingEdit) return;
+    setEditingTask(null);
+  };
+
+  const handleSaveEdit = async (updates) => {
+    if (!editingTask || savingEdit) return;
+
+    try {
+      setSavingEdit(true);
+      const updated = await api.updateTask(editingTask.id, updates);
+      showToast(`Task "${updated.title}" updated successfully!`);
+      setEditingTask(null);
+      await loadData();
+    } catch (err) {
+      showToast(err.message || 'Failed to update task', 'warning');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   const handleToggleComplete = async (task) => {
     try {
       const updated = await api.updateTask(task.id, { completed: !task.completed });
@@ -124,10 +152,20 @@ export function App() {
             tasks={tasks} 
             onToggleComplete={handleToggleComplete} 
             onDelete={handleDeleteTask} 
+            onEdit={handleEditTask}
             onOpenForm={() => setIsFormOpen(true)} 
           />
         )}
       </div>
+
+      {editingTask && (
+        <EditTaskModal
+          task={editingTask}
+          saving={savingEdit}
+          onCancel={handleCancelEdit}
+          onSave={handleSaveEdit}
+        />
+      )}
 
       <Toast toasts={toasts} />
     </div>
