@@ -1,6 +1,5 @@
 import React from 'react';
-import { Check, Trash2, Calendar, Tag, AlertCircle } from 'lucide-react';
-import { Pencil } from 'lucide-react';
+import { Check, Trash2, Calendar, Tag, AlertCircle, Pencil } from 'lucide-react';
 
 export function TaskCard({ task, onToggleComplete, onDelete, onEdit }) {
   const isCompleted = Boolean(task.completed);
