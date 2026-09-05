@@ -26,7 +26,6 @@ export function TaskList({ tasks, onToggleComplete, onDelete, onOpenForm, onEdit
           task={task}
           onToggleComplete={onToggleComplete}
           onDelete={onDelete}
-          onEdit={onEditTask}
           onEditTask={onEditTask}
         />
       ))}
