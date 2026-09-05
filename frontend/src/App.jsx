@@ -17,7 +17,7 @@ export function App() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [filters, setFilters] = useState({
     search: '',
     status: 'all',
@@ -126,18 +126,18 @@ export function App() {
       <div className="bg-glow-2" />
 
       <div className="content-container">
-        <Header 
-          theme={theme} 
-          toggleTheme={toggleTheme} 
-          onOpenForm={() => setIsFormOpen(prev => !prev)} 
+        <Header
+          theme={theme}
+          toggleTheme={toggleTheme}
+          onOpenForm={() => setIsFormOpen(prev => !prev)}
         />
 
         <StatsSummary stats={stats} />
 
         {isFormOpen && (
-          <TaskForm 
-            onSubmit={handleCreateTask} 
-            onClose={() => setIsFormOpen(false)} 
+          <TaskForm
+            onSubmit={handleCreateTask}
+            onClose={() => setIsFormOpen(false)}
           />
         )}
 
@@ -148,12 +148,12 @@ export function App() {
             Loading your tasks...
           </div>
         ) : (
-          <TaskList 
-            tasks={tasks} 
-            onToggleComplete={handleToggleComplete} 
-            onDelete={handleDeleteTask} 
+          <TaskList
+            tasks={tasks}
+            onToggleComplete={handleToggleComplete}
+            onDelete={handleDeleteTask}
             onEdit={handleEditTask}
-            onOpenForm={() => setIsFormOpen(true)} 
+            onOpenForm={() => setIsFormOpen(true)}
           />
         )}
       </div>
