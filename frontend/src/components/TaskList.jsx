@@ -1,6 +1,6 @@
 import React from 'react';
 import { TaskCard } from './TaskCard';
-import { Sparkles } from 'lucide-react';
+import { CheckCircle2, Sparkles } from 'lucide-react';
 
 export function TaskList({ tasks, onToggleComplete, onDelete, onOpenForm, onEditTask }) {
   if (!tasks || tasks.length === 0) {
