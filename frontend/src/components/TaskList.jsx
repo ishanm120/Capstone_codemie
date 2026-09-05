@@ -1,6 +1,6 @@
 import React from 'react';
-import { Sparkles } from 'lucide-react';
 import { TaskCard } from './TaskCard';
+import { Sparkles } from 'lucide-react';
 
 export function TaskList({ tasks, onToggleComplete, onDelete, onOpenForm, onEditTask }) {
   if (!tasks || tasks.length === 0) {
@@ -20,7 +20,7 @@ export function TaskList({ tasks, onToggleComplete, onDelete, onOpenForm, onEdit
 
   return (
     <div className="task-list">
-      {tasks.map((task) => (
+      {tasks.map(task => (
         <TaskCard
           key={task.id}
           task={task}
