@@ -4,6 +4,7 @@ import { StatsSummary } from './components/StatsSummary';
 import { FilterBar } from './components/FilterBar';
 import { TaskForm } from './components/TaskForm';
 import { TaskList } from './components/TaskList';
+import { EditTaskModal } from './components/EditTaskModal';
 import { Toast } from './components/Toast';
 import { api } from './services/api';
 
@@ -12,9 +13,11 @@ export function App() {
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, highPriority: 0 });
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
+  const [savingEdit, setSavingEdit] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [filters, setFilters] = useState({
     search: '',
     status: 'all',
@@ -92,6 +95,31 @@ export function App() {
     }
   };
 
+  const handleOpenEdit = (task) => {
+    setEditingTask(task);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTask(null);
+  };
+
+  const handleSaveEdit = async (updates) => {
+    if (!editingTask) return;
+
+    try {
+      setSavingEdit(true);
+      await api.updateTask(editingTask.id, updates);
+      showToast('Task updated successfully!', 'success');
+      setEditingTask(null);
+      loadData();
+    } catch (err) {
+      showToast(err.message || 'Failed to update task', 'warning');
+      // Keep modal open and inputs intact (modal manages its own input state).
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   return (
     <div className="app-wrapper">
       <div className="bg-glow-1" />
@@ -120,11 +148,21 @@ export function App() {
             Loading your tasks...
           </div>
         ) : (
-          <TaskList 
-            tasks={tasks} 
-            onToggleComplete={handleToggleComplete} 
-            onDelete={handleDeleteTask} 
-            onOpenForm={() => setIsFormOpen(true)} 
+          <TaskList
+            tasks={tasks}
+            onToggleComplete={handleToggleComplete}
+            onDelete={handleDeleteTask}
+            onEdit={handleOpenEdit}
+            onOpenForm={() => setIsFormOpen(true)}
+          />
+        )}
+
+        {editingTask != null && (
+          <EditTaskModal
+            task={editingTask}
+            saving={savingEdit}
+            onCancel={handleCancelEdit}
+            onSave={handleSaveEdit}
           />
         )}
       </div>
