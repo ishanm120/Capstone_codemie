@@ -13,8 +13,11 @@ export function App() {
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, highPriority: 0 });
   const [isFormOpen, setIsFormOpen] = useState(false);
+
+  // KAN-30: Edit functionality
   const [editingTask, setEditingTask] = useState(null);
   const [savingEdit, setSavingEdit] = useState(false);
+
   const [toasts, setToasts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,10 +45,7 @@ export function App() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [fetchedTasks, fetchedStats] = await Promise.all([
-        api.getTasks(filters),
-        api.getStats()
-      ]);
+      const [fetchedTasks, fetchedStats] = await Promise.all([api.getTasks(filters), api.getStats()]);
       setTasks(fetchedTasks);
       setStats(fetchedStats);
     } catch (err) {
@@ -63,7 +63,7 @@ export function App() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  const handleCreateTask = async (taskData) => {
+  const handleCreateTask = async taskData => {
     try {
       const created = await api.createTask(taskData);
       showToast(`Task "${created.title}" created successfully!`);
@@ -74,7 +74,8 @@ export function App() {
     }
   };
 
-  const handleEditTask = (task) => {
+  // KAN-30: Edit handlers
+  const handleEditTask = task => {
     setEditingTask(task);
   };
 
@@ -83,7 +84,7 @@ export function App() {
     setEditingTask(null);
   };
 
-  const handleSaveEdit = async (updates) => {
+  const handleSaveEdit = async updates => {
     if (!editingTask || savingEdit) return;
 
     try {
@@ -99,7 +100,7 @@ export function App() {
     }
   };
 
-  const handleToggleComplete = async (task) => {
+  const handleToggleComplete = async task => {
     try {
       const updated = await api.updateTask(task.id, { completed: !task.completed });
       const statusText = updated.completed ? 'completed' : 'reactivated';
@@ -110,9 +111,9 @@ export function App() {
     }
   };
 
-  const handleDeleteTask = async (id) => {
+  const handleDeleteTask = async id => {
     try {
-      const result = await api.deleteTask(id);
+      await api.deleteTask(id);
       showToast('Task deleted successfully', 'info');
       loadData();
     } catch (err) {
@@ -126,25 +127,19 @@ export function App() {
       <div className="bg-glow-2" />
 
       <div className="content-container">
-        <Header
-          theme={theme}
-          toggleTheme={toggleTheme}
-          onOpenForm={() => setIsFormOpen(prev => !prev)}
-        />
+        <Header theme={theme} toggleTheme={toggleTheme} onOpenForm={() => setIsFormOpen(prev => !prev)} />
 
         <StatsSummary stats={stats} />
 
-        {isFormOpen && (
-          <TaskForm
-            onSubmit={handleCreateTask}
-            onClose={() => setIsFormOpen(false)}
-          />
-        )}
+        {isFormOpen && <TaskForm onSubmit={handleCreateTask} onClose={() => setIsFormOpen(false)} />}
 
         <FilterBar filters={filters} setFilters={setFilters} />
 
         {loading ? (
-          <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+          <div
+            className="glass-card"
+            style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}
+          >
             Loading your tasks...
           </div>
         ) : (
@@ -159,12 +154,7 @@ export function App() {
       </div>
 
       {editingTask && (
-        <EditTaskModal
-          task={editingTask}
-          saving={savingEdit}
-          onCancel={handleCancelEdit}
-          onSave={handleSaveEdit}
-        />
+        <EditTaskModal task={editingTask} saving={savingEdit} onCancel={handleCancelEdit} onSave={handleSaveEdit} />
       )}
 
       <Toast toasts={toasts} />
