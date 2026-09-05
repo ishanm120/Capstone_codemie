@@ -641,6 +641,88 @@ body {
   transform: scale(1.05);
 }
 
+/* Edit Button (neutral, matches delete sizing) */
+.edit-btn {
+  background: var(--bg-glass);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.edit-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+/* Modal */
+.tm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  z-index: 200; /* above .toast-container (100) */
+}
+
+.tm-modal {
+  width: 100%;
+  max-width: 640px;
+  padding: 1.5rem;
+}
+
+.tm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tm-modal-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.tm-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Inline error */
+.tm-inline-error {
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-md);
+  background: var(--priority-high-bg);
+  border: 1px solid var(--priority-high-border);
+  color: var(--priority-high-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Icons inside inputs */
+.tm-input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
 /* Empty State */
 .empty-state {
   padding: 4rem 2rem;
