@@ -31,11 +31,38 @@ test.describe('Task Management V1 Core Workflows', () => {
   });
 
   test('2. Display existing tasks and filter', async ({ page }) => {
-    // Search for a specific seeded task or created task
-    await page.fill('#task-search-input', 'Express');
-    await expect(page.locator('.task-title', { hasText: 'Implement Express API endpoints' })).toBeVisible();
+    // Create two tasks with distinct categories for category filtering assertions
+    const timestamp = Date.now();
+    const backendTitle = `E2E Backend Task ${timestamp}`;
+    const testingTitle = `E2E Testing Task ${timestamp}`;
 
-    // Clear search
+    // Create backend task
+    await page.click('#add-task-btn');
+    await page.fill('#task-title-input', backendTitle);
+    await page.selectOption('#task-category-select', 'backend');
+    await page.click('#save-task-submit');
+    await expect(page.locator('.task-title', { hasText: backendTitle })).toBeVisible();
+
+    // Create testing task
+    await page.click('#add-task-btn');
+    await page.fill('#task-title-input', testingTitle);
+    await page.selectOption('#task-category-select', 'testing');
+    await page.click('#save-task-submit');
+    await expect(page.locator('.task-title', { hasText: testingTitle })).toBeVisible();
+
+    // Category dropdown filtering: show only 'testing' tasks
+    await page.selectOption('#category-select', 'testing');
+    await expect(page.locator('.task-title', { hasText: testingTitle })).toBeVisible();
+    await expect(page.locator('.task-title', { hasText: backendTitle })).not.toBeVisible();
+
+    // Combine with search filter while category=testing
+    const searchTerm = 'Testing';
+    await page.fill('#task-search-input', searchTerm);
+    await expect(page.locator('.task-title', { hasText: testingTitle })).toBeVisible();
+    await expect(page.locator('.task-title', { hasText: backendTitle })).not.toBeVisible();
+
+    // Reset filters
+    await page.selectOption('#category-select', 'all');
     await page.fill('#task-search-input', '');
   });
 
