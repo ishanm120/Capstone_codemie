@@ -20,13 +20,14 @@ export function TaskList({ tasks, onToggleComplete, onDelete, onOpenForm, onEdit
 
   return (
     <div className="task-list">
-      {tasks.map(task => (
+      {tasks.map((task) => (
         <TaskCard
           key={task.id}
           task={task}
           onToggleComplete={onToggleComplete}
           onDelete={onDelete}
           onEdit={onEditTask}
+          onEditTask={onEditTask}
         />
       ))}
     </div>
