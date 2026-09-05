@@ -23,7 +23,11 @@ jobs:
           node-version: 22
 
       - name: Install
-        run: npm install --no-audit --no-fund
+        run: |
+          npm config set fetch-retries 5
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
+          npm install --no-audit --no-fund
 
       - name: Unit tests
         run: npm test
