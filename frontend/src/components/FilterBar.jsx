@@ -14,7 +14,9 @@ export function FilterBar({ filters, setFilters }) {
     setFilters((prev) => ({ ...prev, priority: e.target.value }));
   };
 
-  const handleCategoryChange = (e) => { setFilters(prev => ({ ...prev, category: e.target.value })); };
+  const handleCategoryChange = (e) => {
+    setFilters(prev => ({ ...prev, category: e.target.value }));
+  };
 
   const handleSortChange = (e) => {
     setFilters((prev) => ({ ...prev, sortBy: e.target.value }));
