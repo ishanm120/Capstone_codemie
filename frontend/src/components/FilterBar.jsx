@@ -3,23 +3,23 @@ import { Search, Filter, ArrowUpDown } from 'lucide-react';
 
 export function FilterBar({ filters, setFilters }) {
   const handleSearchChange = (e) => {
-    setFilters(prev => ({ ...prev, search: e.target.value }));
+    setFilters((prev) => ({ ...prev, search: e.target.value }));
   };
 
   const handleStatusChange = (status) => {
-    setFilters(prev => ({ ...prev, status }));
+    setFilters((prev) => ({ ...prev, status }));
   };
 
   const handlePriorityChange = (e) => {
-    setFilters(prev => ({ ...prev, priority: e.target.value }));
+    setFilters((prev) => ({ ...prev, priority: e.target.value }));
   };
 
   const handleCategoryChange = (e) => {
-    setFilters(prev => ({ ...prev, category: e.target.value }));
+    setFilters((prev) => ({ ...prev, category: e.target.value }));
   };
 
   const handleSortChange = (e) => {
-    setFilters(prev => ({ ...prev, sortBy: e.target.value }));
+    setFilters((prev) => ({ ...prev, sortBy: e.target.value }));
   };
 
   return (
@@ -52,7 +52,9 @@ export function FilterBar({ filters, setFilters }) {
           Active
         </button>
         <button
-          className={`filter-pill ${filters.status === 'completed' ? 'active' : ''}`}
+          className={`filter-pill ${
+            filters.status === 'completed' ? 'active' : ''
+          }`}
           onClick={() => handleStatusChange('completed')}
           id="filter-completed-btn"
         >
