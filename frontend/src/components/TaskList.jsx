@@ -2,7 +2,7 @@ import React from 'react';
 import { TaskCard } from './TaskCard';
 import { CheckCircle2, Sparkles } from 'lucide-react';
 
-export function TaskList({ tasks, onToggleComplete, onDelete, onOpenForm }) {
+export function TaskList({ tasks, onToggleComplete, onDelete, onOpenForm, onEdit }) {
   if (!tasks || tasks.length === 0) {
     return (
       <div className="glass-card empty-state">
@@ -26,6 +26,7 @@ export function TaskList({ tasks, onToggleComplete, onDelete, onOpenForm }) {
           task={task}
           onToggleComplete={onToggleComplete}
           onDelete={onDelete}
+          onEdit={onEdit}
         />
       ))}
     </div>
