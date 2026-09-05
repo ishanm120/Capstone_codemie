@@ -1,7 +1,7 @@
 import React from 'react';
 import { Check, Trash2, Calendar, Tag, AlertCircle, Pencil } from 'lucide-react';
 
-export function TaskCard({ task, onToggleComplete, onDelete, onEdit }) {
+export function TaskCard({ task, onToggleComplete, onDelete, onEditTask }) {
   const isCompleted = Boolean(task.completed);
 
   const getPriorityBadge = (p) => {
@@ -48,7 +48,10 @@ export function TaskCard({ task, onToggleComplete, onDelete, onEdit }) {
           <div className="task-actions">
             <button
               className="icon-btn"
-              onClick={() => onEdit?.(task)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditTask?.(task);
+              }}
               title="Edit task"
               id={`edit-task-${task.id}`}
             >
