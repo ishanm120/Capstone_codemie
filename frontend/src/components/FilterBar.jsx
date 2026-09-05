@@ -15,10 +15,6 @@ export function FilterBar({ filters, setFilters }) {
   };
 
   const handleCategoryChange = (e) => {
-    setFilters(prev => ({ ...prev, category: e.target.value }));
-  };
-
-  const handleCategoryChange = (e) => {
     setFilters((prev) => ({ ...prev, category: e.target.value }));
   };
 
