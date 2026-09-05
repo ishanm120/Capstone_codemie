@@ -743,12 +743,33 @@ body {
   color: var(--text-primary);
 }
 
-/* Form error (match existing form typography/colors) */
+/* Form error (match TaskForm's error box styling) */
 .form-error {
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--priority-high-text);
+
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+
   font-size: 0.85rem;
   font-weight: 600;
-  color: #f87171;
+  line-height: 1.35;
+}
+
+/* If an icon element is present, size/align it without requiring markup changes */
+.form-error svg,
+.form-error .icon,
+.form-error .error-icon {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin-top: 0.1rem;
+  color: currentColor;
 }
 
 /* Edit button (similar to delete-btn, but "info" tinted) */
