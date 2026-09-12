@@ -18,6 +18,11 @@ export function FilterBar({ filters, setFilters }) {
     setFilters(prev => ({ ...prev, sortBy: e.target.value }));
   };
 
+  const handleCategoryChange = (e) => {
+    const category = e.target.value;
+    setFilters(prev => ({ ...prev, category }));
+  };
+
   return (
     <div className="glass-card toolbar-card">
       <div className="search-box">
@@ -84,6 +89,24 @@ export function FilterBar({ filters, setFilters }) {
             <option value="due_date">Due Date</option>
             <option value="priority">Priority</option>
             <option value="title">Title A-Z</option>
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <select
+            className="select-input"
+            value={filters.category}
+            onChange={handleCategoryChange}
+            id="category-select"
+          >
+            <option value="all">All Categories</option>
+            <option value="general">General</option>
+            <option value="work">Work</option>
+            <option value="personal">Personal</option>
+            <option value="design">Design</option>
+            <option value="backend">Backend</option>
+            <option value="frontend">Frontend</option>
+            <option value="testing">Testing</option>
           </select>
         </div>
       </div>
