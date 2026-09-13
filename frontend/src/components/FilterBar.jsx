@@ -14,6 +14,10 @@ export function FilterBar({ filters, setFilters }) {
     setFilters(prev => ({ ...prev, priority: e.target.value }));
   };
 
+  const handleCategoryChange = (e) => {
+    setFilters(prev => ({ ...prev, category: e.target.value }));
+  };
+
   const handleSortChange = (e) => {
     setFilters(prev => ({ ...prev, sortBy: e.target.value }));
   };
@@ -69,6 +73,25 @@ export function FilterBar({ filters, setFilters }) {
             <option value="high">High</option>
             <option value="medium">Medium</option>
             <option value="low">Low</option>
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <Filter size={15} color="var(--text-muted)" />
+          <select
+            className="select-input"
+            value={filters.category}
+            onChange={handleCategoryChange}
+            id="category-select"
+          >
+            <option value="all">All Categories</option>
+            <option value="general">General</option>
+            <option value="work">Work</option>
+            <option value="personal">Personal</option>
+            <option value="design">Design</option>
+            <option value="backend">Backend</option>
+            <option value="frontend">Frontend</option>
+            <option value="testing">Testing</option>
           </select>
         </div>
 
