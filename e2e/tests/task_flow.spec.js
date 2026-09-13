@@ -81,3 +81,49 @@ test.describe('Task Management V1 Core Workflows', () => {
     await expect(page.locator('.task-title', { hasText: taskTitle })).not.toBeVisible();
   });
 });
+
+test.describe('Category Filter (KAN-103)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('http://localhost:3000');
+    await expect(page.locator('h1.brand-title')).toHaveText('TaskMaster Pro');
+  });
+
+  test('TC-01. Category dropdown renders with required options and default', async ({ page }) => {
+    const categorySelect = page.locator('#category-select');
+    await expect(categorySelect).toBeVisible();
+    await expect(categorySelect).toHaveValue('all');
+
+    const optionValues = await categorySelect.locator('option').evaluateAll(
+      options => options.map(option => option.value)
+    );
+    for (const value of ['all', 'general', 'work', 'personal', 'design', 'backend', 'frontend', 'testing']) {
+      expect(optionValues).toContain(value);
+    }
+    await expect(categorySelect.locator('option[value="all"]')).toHaveText('All Categories');
+  });
+
+  test('TC-02. Category filtering restricts results and All Categories resets it', async ({ page }) => {
+    await page.selectOption('#category-select', 'backend');
+    await expect(page.locator('.task-title', { hasText: 'Implement Express API endpoints' })).toBeVisible();
+    await expect(page.locator('.task-title', { hasText: 'Design modern dashboard layout' })).not.toBeVisible();
+
+    await page.selectOption('#category-select', 'all');
+    await expect(page.locator('.task-title', { hasText: 'Design modern dashboard layout' })).toBeVisible();
+  });
+
+  test('TC-03. Category composes with Search and Completed status filters', async ({ page }) => {
+    await page.selectOption('#category-select', 'backend');
+    await page.fill('#task-search-input', 'Express');
+    await expect(page.locator('.task-title', { hasText: 'Implement Express API endpoints' })).toBeVisible();
+
+    await page.click('#filter-completed-btn');
+    await expect(page.locator('.task-title', { hasText: 'Implement Express API endpoints' })).toBeVisible();
+
+    await page.selectOption('#category-select', 'all');
+    await expect(page.locator('.task-title', { hasText: 'Implement Express API endpoints' })).toBeVisible();
+
+    // Reset app-level filters for subsequent tests
+    await page.fill('#task-search-input', '');
+    await page.click('#filter-all-btn');
+  });
+});
