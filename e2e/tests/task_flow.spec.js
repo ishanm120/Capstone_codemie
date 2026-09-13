@@ -80,4 +80,46 @@ test.describe('Task Management V1 Core Workflows', () => {
     // Verify task is removed from DOM
     await expect(page.locator('.task-title', { hasText: taskTitle })).not.toBeVisible();
   });
+
+  test('TC-01 Category dropdown options and filtering', async ({ page }) => {
+    const timestamp = Date.now();
+    const backendTaskTitle = `QA Cat Backend ${timestamp}`;
+    const designTaskTitle = `QA Cat Design ${timestamp}`;
+
+    // Verify Category dropdown exists with default value "all" and label "All Categories"
+    const categorySelect = page.locator('#category-select');
+    await expect(categorySelect).toBeVisible();
+    await expect(categorySelect).toHaveValue('all');
+    await expect(categorySelect.locator('option[value="all"]')).toHaveText('All Categories');
+
+    // Verify dropdown options include exactly the approved values
+    const optionValues = await categorySelect.locator('option').evaluateAll(
+      opts => opts.map(o => o.value)
+    );
+    expect(optionValues).toEqual(['all', 'general', 'work', 'personal', 'design', 'backend', 'frontend', 'testing']);
+
+    // Create a task categorized as "backend"
+    await page.click('#add-task-btn');
+    await page.fill('#task-title-input', backendTaskTitle);
+    await page.selectOption('#task-category-select', 'backend');
+    await page.click('#save-task-submit');
+    await expect(page.locator('.task-title', { hasText: backendTaskTitle })).toBeVisible();
+
+    // Create a task categorized as "design"
+    await page.click('#add-task-btn');
+    await page.fill('#task-title-input', designTaskTitle);
+    await page.selectOption('#task-category-select', 'design');
+    await page.click('#save-task-submit');
+    await expect(page.locator('.task-title', { hasText: designTaskTitle })).toBeVisible();
+
+    // Select category "backend" and assert only the backend task is visible
+    await page.selectOption('#category-select', 'backend');
+    await expect(page.locator('.task-title', { hasText: backendTaskTitle })).toBeVisible();
+    await expect(page.locator('.task-title', { hasText: designTaskTitle })).not.toBeVisible();
+
+    // Reset to "All Categories" and assert both tasks are visible again
+    await page.selectOption('#category-select', 'all');
+    await expect(page.locator('.task-title', { hasText: backendTaskTitle })).toBeVisible();
+    await expect(page.locator('.task-title', { hasText: designTaskTitle })).toBeVisible();
+  });
 });
