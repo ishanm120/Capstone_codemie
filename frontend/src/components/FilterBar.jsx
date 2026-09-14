@@ -1,5 +1,7 @@
 import React from 'react';
-import { Search, Filter, ArrowUpDown } from 'lucide-react';
+import { Search, Filter, Tag, ArrowUpDown } from 'lucide-react';
+
+const CATEGORIES = ['general', 'work', 'personal', 'design', 'backend', 'frontend', 'testing'];
 
 export function FilterBar({ filters, setFilters }) {
   const handleSearchChange = (e) => {
@@ -12,6 +14,11 @@ export function FilterBar({ filters, setFilters }) {
 
   const handlePriorityChange = (e) => {
     setFilters(prev => ({ ...prev, priority: e.target.value }));
+  };
+
+  const handleCategoryChange = (e) => {
+    const category = e.target.value;
+    setFilters(prev => ({ ...prev, category }));
   };
 
   const handleSortChange = (e) => {
@@ -69,6 +76,23 @@ export function FilterBar({ filters, setFilters }) {
             <option value="high">High</option>
             <option value="medium">Medium</option>
             <option value="low">Low</option>
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <Tag size={15} color="var(--text-muted)" />
+          <select
+            className="select-input"
+            value={filters.category}
+            onChange={handleCategoryChange}
+            id="category-select"
+          >
+            <option value="all">All Categories</option>
+            {CATEGORIES.map(category => (
+              <option key={category} value={category}>
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </option>
+            ))}
           </select>
         </div>
 
