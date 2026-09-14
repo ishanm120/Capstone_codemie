@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('KAN-107 Category Filter Dropdown', () => {
+test.describe('KAN-109 Category Filter Dropdown', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:3000');
     await expect(page.locator('h1.brand-title')).toHaveText('TaskMaster Pro');
@@ -85,5 +85,58 @@ test.describe('KAN-107 Category Filter Dropdown', () => {
     await page.selectOption('#category-select', 'all');
     await expect(page.locator('.task-title', { hasText: alphaTitle })).toBeVisible();
     await expect(page.locator('.task-title', { hasText: betaTitle })).toBeVisible();
+  });
+
+  test('4. Category filter is reflected in the URL and survives a page reload', async ({ page }) => {
+    const timestamp = Date.now();
+    const workTitle = `QA109 Work Task ${timestamp}`;
+    const personalTitle = `QA109 Personal Task ${timestamp}`;
+
+    await page.click('#add-task-btn');
+    await page.fill('#task-title-input', workTitle);
+    await page.selectOption('#task-category-select', 'work');
+    await page.click('#save-task-submit');
+    await expect(page.locator('.task-title', { hasText: workTitle })).toBeVisible();
+
+    await page.click('#add-task-btn');
+    await page.fill('#task-title-input', personalTitle);
+    await page.selectOption('#task-category-select', 'personal');
+    await page.click('#save-task-submit');
+    await expect(page.locator('.task-title', { hasText: personalTitle })).toBeVisible();
+
+    await page.selectOption('#category-select', 'work');
+    await expect(page.locator('.task-title', { hasText: workTitle })).toBeVisible();
+    await expect(page.locator('.task-title', { hasText: personalTitle })).not.toBeVisible();
+    expect(new URL(page.url()).searchParams.get('category')).toBe('work');
+
+    await page.reload();
+    await expect(page.locator('#category-select')).toHaveValue('work');
+    await expect(page.locator('.task-title', { hasText: workTitle })).toBeVisible();
+    await expect(page.locator('.task-title', { hasText: personalTitle })).not.toBeVisible();
+  });
+
+  test('5. Browser back/forward navigation restores the previous category selection', async ({ page }) => {
+    const timestamp = Date.now();
+    const workTitle = `QA109 History Work Task ${timestamp}`;
+
+    await page.click('#add-task-btn');
+    await page.fill('#task-title-input', workTitle);
+    await page.selectOption('#task-category-select', 'work');
+    await page.click('#save-task-submit');
+    await expect(page.locator('.task-title', { hasText: workTitle })).toBeVisible();
+
+    await page.selectOption('#category-select', 'work');
+    expect(new URL(page.url()).searchParams.get('category')).toBe('work');
+
+    await page.selectOption('#category-select', 'all');
+    expect(new URL(page.url()).searchParams.get('category')).toBeNull();
+
+    await page.goBack();
+    await expect(page.locator('#category-select')).toHaveValue('work');
+    expect(new URL(page.url()).searchParams.get('category')).toBe('work');
+
+    await page.goForward();
+    await expect(page.locator('#category-select')).toHaveValue('all');
+    expect(new URL(page.url()).searchParams.get('category')).toBeNull();
   });
 });

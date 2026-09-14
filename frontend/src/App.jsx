@@ -6,6 +6,7 @@ import { TaskForm } from './components/TaskForm';
 import { TaskList } from './components/TaskList';
 import { Toast } from './components/Toast';
 import { api } from './services/api';
+import { getCategoryFromUrl, buildCategoryUrl } from './utils/categoryUrlFilter';
 
 export function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
@@ -14,12 +15,12 @@ export function App() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [filters, setFilters] = useState({
     search: '',
     status: 'all',
     priority: 'all',
-    category: 'all',
+    category: getCategoryFromUrl(),
     sortBy: 'created_at'
   });
 
@@ -27,6 +28,22 @@ export function App() {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    const newUrl = buildCategoryUrl(filters.category);
+    const currentUrl = `${window.location.pathname}${window.location.search}`;
+    if (newUrl !== currentUrl) {
+      window.history.pushState({}, '', newUrl);
+    }
+  }, [filters.category]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setFilters(prev => ({ ...prev, category: getCategoryFromUrl() }));
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const showToast = (message, type = 'success') => {
     const id = Date.now();
