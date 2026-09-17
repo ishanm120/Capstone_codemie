@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Header } from './components/Header';
 import { StatsSummary } from './components/StatsSummary';
 import { FilterBar } from './components/FilterBar';
@@ -40,7 +40,12 @@ export function App() {
     try {
       setLoading(true);
       const [fetchedTasks, fetchedStats] = await Promise.all([
-        api.getTasks(filters),
+        api.getTasks({
+          search: filters.search,
+          status: filters.status,
+          priority: filters.priority,
+          sortBy: filters.sortBy
+        }),
         api.getStats()
       ]);
       setTasks(fetchedTasks);
@@ -54,7 +59,20 @@ export function App() {
 
   useEffect(() => {
     loadData();
-  }, [filters]);
+  }, [filters.search, filters.status, filters.priority, filters.sortBy]);
+
+  const categories = useMemo(() => {
+    const unique = new Set();
+    tasks.forEach(task => {
+      if (task.category) unique.add(task.category);
+    });
+    return Array.from(unique).sort();
+  }, [tasks]);
+
+  const visibleTasks = useMemo(() => {
+    if (filters.category === 'all') return tasks;
+    return tasks.filter(task => task.category === filters.category);
+  }, [tasks, filters.category]);
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
@@ -113,18 +131,18 @@ export function App() {
           />
         )}
 
-        <FilterBar filters={filters} setFilters={setFilters} />
+        <FilterBar filters={filters} setFilters={setFilters} categories={categories} />
 
         {loading ? (
           <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             Loading your tasks...
           </div>
         ) : (
-          <TaskList 
-            tasks={tasks} 
-            onToggleComplete={handleToggleComplete} 
-            onDelete={handleDeleteTask} 
-            onOpenForm={() => setIsFormOpen(true)} 
+          <TaskList
+            tasks={visibleTasks}
+            onToggleComplete={handleToggleComplete}
+            onDelete={handleDeleteTask}
+            onOpenForm={() => setIsFormOpen(true)}
           />
         )}
       </div>
