@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, X, Calendar, Tag, AlertCircle } from 'lucide-react';
+import { CATEGORIES } from '../constants/categories';
 
 export function TaskForm({ onSubmit, onClose }) {
   const [title, setTitle] = useState('');
@@ -102,13 +103,9 @@ export function TaskForm({ onSubmit, onClose }) {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
-              <option value="general">General</option>
-              <option value="work">Work</option>
-              <option value="personal">Personal</option>
-              <option value="design">Design</option>
-              <option value="backend">Backend</option>
-              <option value="frontend">Frontend</option>
-              <option value="testing">Testing</option>
+              {CATEGORIES.map(({ value, label }) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
             </select>
           </div>
 
